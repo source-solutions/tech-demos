@@ -64,50 +64,22 @@ setup:
 	ld hl, fade_0 + 63;					// last entry @ 0% intensity
 	call set_palette;					// make the screen black
 
-startshow:
-	ld hl, slide_no;					// address slide number (ASCII)
-	ld a, '0';							// reset slide number
-	ld (hl), a;							// to '00'
-	inc hl;
-	ld (hl), a;
+title:
+	ld ix, title_screen;				// ASCIIZ filename
+	call show_title;					// display title screen and play music
 
-	call show_slide;					// display slide 01
-	call show_slide;					// display slide 02
-	call show_slide;					// display slide 03
+;	call roll_text;						// do scroll
 
-	call roll_text;						// do scroll
+	rst 0;								// reset
 
-	call show_slide;					// display slide 04
-	call show_slide;					// display slide 05
-	call show_slide;					// display slide 06
-	call show_slide;					// display slide 07
-	call show_slide;					// display slide 08
-	call show_slide;					// display slide 09
+;space:
+;	ld a, $7f;							// high byte of I/O address
+;	in a, ($fe);						// read byte
+;	rra;								// set carry if space pressed
+;	jp c, space;						// loop until space pressed
+;	jp startshow;						// back to the start
 
-	ld hl, slide_no;					// address slide number (ASCII)
-	ld a, '1';							// inccrement first ASCII digit
-	ld (hl), a;							// to '00'
-	inc hl;								// address second ASCII digit
-	ld a, '0' - 1;						// will loop to '0'
-	ld (hl), a;							// set it
-
-	call show_slide;					// display slide 10
-	call show_slide;					// display slide 11
-	call show_slide;					// display slide 12
-
-space:
-	ld a, $7f;							// high byte of I/O address
-	in a, ($fe);						// read byte
-	rra;								// set carry if space pressed
-	jp c, space;						// loop until space pressed
-	jp startshow;						// back to the start
-
-show_slide:
-	ld hl, slide_no + 1;				// address second ASCII digit
-	ld a, (hl);							// get it
-	inc a;								// increment it
-	ld (hl), a;							// write it back
-	ld ix, slide;						// ASCIIZ filename
+show_title:
 	call open;							// open file
 
 	ld ix, $c000;						// offset 0 in frame buffer
@@ -142,7 +114,7 @@ show_slide:
 	ld hl, fade_7 + 63;					// last entry @ 100% intensity
 	call set_palette;					// set palette
 
-	call pause;							// wait for key press
+	call play_music;					// wait for key press
 
 	ld hl, fade_6 + 63;					// last entry @ 86% intensity
 	call set_palette;					// set palette
@@ -326,7 +298,7 @@ roll_text:
 
 	call clear_screen;					// clear it
 
-	ld ix, filename;					// point to data
+	ld ix, credits;						// point to data
 	call open;							// open file for reading
 
 skip_header:
@@ -442,15 +414,17 @@ row_table:
     defw $b8c0, $b9c0, $bac0, $bbc0, $bcc0, $bdc0, $bec0, $bfc0
     defw $b8e0, $b9e0, $bae0, $bbe0, $bce0, $bde0, $bee0, $bfe0
 
-slide:
-	defb "slide_";						// filename for slide
+title_screen:
+	defb "TITLE.SCR", 0;
 
-slide_no:
-	defb "01";
-	defb ".scr", 0;
+credits_screen:
+	defb "CREDITS.SCR", 0;
 
-filename:
-	defb "rolltext.bmp", 0;
+credits:
+	defb "CREDITS.BMP", 0;
+
+music:
+	defb "TITLE.MYM", 0;
 
 reg:
 	defb 0
@@ -503,6 +477,7 @@ text:
 
 ; MODULE psg
 
+play_music:
 	org 32768;							// 
 
 	exx;								// Starting values for procedure readbits
@@ -860,4 +835,4 @@ uncomp:
 
 ; Tune is loaded to this address
 rows:
-	incbin "TITLE.MYM";					// title tune
+	incbin "../RSC/TITLE.MYM";			// title tune
