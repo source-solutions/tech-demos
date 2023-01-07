@@ -1,0 +1,2 @@
+prg:
+	pasmo TITLES.ASM ../PRG/TITLES.PRG
