@@ -1,0 +1,2 @@
+prg:
+	pasmo SLIDESHO.ASM ../PRG/SLIDESHO.PRG
