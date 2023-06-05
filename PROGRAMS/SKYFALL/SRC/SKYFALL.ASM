@@ -2,8 +2,8 @@
 ; 	//			 Using the Arkos Tracker 2 AKY TurboSound player.
 ;	// Copyright (c) 2020 Source Solutions, Inc.
 
-;	// OS hook codes
-	include "UNODOS3.INC"
+;	// system headers
+	include "../../../SYSTEM/HEADERS/SYSTEM.INC"
 
 ;	// constants
 	print_a equ $10;					// print a character
@@ -12,41 +12,19 @@
 	org $6000
 
 ;	// print intro text
-pr_text:
-	ld a, 12;							// FF
-	rst print_a;						// clear screen
-	ld a, 2;							// select main screen
-	call chan_open;						// select channel
-	ld hl, text;						// point to text
+	xor a;								// LD A, 0 (system screen)
+	call SEScreenMode;					// API: set screen mode (also does CLS)
 
-pr_loop:
-	ld a, (hl);							// get character
-	and a;								// terminating byte?
-	jr z, pr_lower;						// jump if so;
-	rst print_a;						// print character
-	inc hl;								// point to next character
-	jr pr_loop;							// loop until done
+	ld ix, text;						// point to text
+	call SEScreenPrintString;			// API: print ASCIIZ string
 
-pr_lower
-	inc hl;								// next position
-	push hl;							// stack pointer
-	ld a, 1;							// select lower screen
-	call chan_open;						// select channel
-	pop hl;								// unstack pointer
-
-pr_l_loop:
-	ld a, (hl);							// get character
-	and a;								// terminating byte?
-	jr z, pr_key;						// jump if so;
-	rst print_a;						// print character
-	inc hl;								// point to next character
-	jr pr_l_loop;						// loop until done
+	ld ix, text_lo;						// point to text
+	call SEScreenLowerPrintString;		// API: print ASCIIZ string (lower screen)
 
 pr_key:
-	ld a, $7f;							// high byte of I/O address
-	in a, ($fe);						// read byte
-	rra;								// set carry if space pressed
-	jp c, pr_key;						// loop until space pressed
+	call SEKeyWait;						// wait for a keypress
+	cp ' ';								// space?
+	jr nz, pr_key;						// loop if not
 
 ;	// original start
 
@@ -73,21 +51,8 @@ ld_title_scr:
 
 	call close;							// close file
 
-set_palette:
-	ld hl, $f83f;						// last byte of palette
-	ld c, $3b;							// palette port
-	ld de, $00bf;						// d = data, e = register
-	ld a, 64;							// becomes 63
-	halt;								// wait for vblank
-
-palette_loop:
-	dec a;								// next register
-	ld b, e;							// register port
-	out (c), a;							// select register
-	ld b, d;							// data port
-	outd;								// dec b; out bc, (hl); dec hl
-	and a;								// was that the last register?
-	jr nz, palette_loop;				// set all 64 entries
+ 	ld ix, $f83f -63;					// last byte of palette
+	call SEPaletteSet;					// API: set 64 palette registers
 
 ram_pag:
 	ld a, %00011000;					// video 1, ROM 1, RAM 0
@@ -131,7 +96,7 @@ handle;
 	defb 0;								// file handle
 
 text:
-	defb "Skyfall (Version 1.1)", 13;
+	defb "Skyfall - version 1.2", 13;
  	defb "Copyright (C) 2012 Adele Adkins & Paul Epworth", 13;
 	defb 13;
 	defb "The boot chime of the Chloe 280SE is Cm9, a variation on the James Bond chord.", 13;
@@ -154,4 +119,6 @@ text:
 	defb "note polyphony per track in Aria Maestosa. This version of the MIDI file is then", 13;
 	defb "imported into Arkos Tracker II. The player code comes from ", '"', "The Last V8", '"', " demo.", 13;
 	defb 0;
+
+text_lo:
 	defb "NOW PRESS SPACE TO START THE DEMO", 0;

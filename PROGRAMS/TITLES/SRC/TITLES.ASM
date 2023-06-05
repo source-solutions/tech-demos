@@ -2,8 +2,8 @@
 
 ;	// Copyright (c) 2023 Source Solutions, Inc.
 
-;	// OS hook codes
-	include "UNODOS3.INC"
+;	// system headers
+	include "../../../SYSTEM/HEADERS/SYSTEM.INC"
 
 	frame equ 23672;					// returns to zero every second
 	back_buffer equ $a800;				// upper limit of non-paged RAM
@@ -45,10 +45,9 @@ pr_l_loop:
 	jr pr_l_loop;						// loop until done
 
 pr_key:
-	ld a, $7f;							// high byte of I/O address
-	in a, ($fe);						// read byte
-	rra;								// set carry if space pressed
-	jp c, pr_key;						// loop until space pressed
+	call SEKeyWait;						// wait for a keypress
+	cp ' ';								// space?
+	jr nz, pr_key;						// loop if not
 
 ;	// original start
 

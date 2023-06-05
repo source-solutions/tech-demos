@@ -2,8 +2,8 @@
 ; 	//			 fade palettes in and out and use the frame counter.
 ;	// Copyright (c) 2019 Source Solutions, Inc.
 
-;	// OS hook codes
-	include "UNODOS3.INC"
+;	// system headers
+	include "../../../SYSTEM/HEADERS/SYSTEM.INC"
 
 ;	// constants
 	print_a equ $10;					// print a character
@@ -283,45 +283,24 @@ fade_7 equ fade_6 + 64
 
 ;	// print intro text
 pr_text:
-	ld a, 12;							// FF
-	rst print_a;						// clear screen
-	ld a, 2;							// select main screen
-	call chan_open;						// select channel
-	ld hl, text;						// point to text
+	xor a;								// LD A, 0 (system screen)
+	call SEScreenMode;					// API: set screen mode (also does CLS)
 
-pr_loop:
-	ld a, (hl);							// get character
-	and a;								// terminating byte?
-	jr z, pr_lower;						// jump if so;
-	rst print_a;						// print character
-	inc hl;								// point to next character
-	jr pr_loop;							// loop until done
+	ld ix, text;						// point to text
+	call SEScreenPrintString;			// API: print ASCIIZ string
 
-pr_lower
-	inc hl;								// next position
-	push hl;							// stack pointer
-	ld a, 1;							// select lower screen
-	call chan_open;						// select channel
-	pop hl;								// unstack pointer
-
-pr_l_loop:
-	ld a, (hl);							// get character
-	and a;								// terminating byte?
-	jr z, pr_key;						// jump if so;
-	rst print_a;						// print character
-	inc hl;								// point to next character
-	jr pr_l_loop;						// loop until done
+	ld ix, text_lo;						// point to text
+	call SEScreenLowerPrintString;		// API: print ASCIIZ string (lower screen)
 
 pr_key:
-	ld a, $7f;							// high byte of I/O address
-	in a, ($fe);						// read byte
-	rra;								// set carry if space pressed
-	jp c, pr_key;						// loop until space pressed
-	ret;								// done
+	call SEKeyWait;						// wait for a keypress
+	cp ' ';								// space?
+	jr nz, pr_key;						// loop if not
+	ret;								// end of subroutine
 
 text:
-	defb "Slideshow (Version 1.1)", 13;
- 	defb "Copyright (C) 2019 Source Solutions, Inc.", 13;
+	defb "Slideshow - version 1.2", 13;
+ 	defb "Copyright (C) 2019-2023 Source Solutions, Inc.", 13;
 	defb 13;
 	defb "The slideshow app was the first demos written specifically for the Chloe 280SE.", 13;
 	defb "It was intended as a tech demo to show off how to recursively read files from a", 13;
@@ -343,4 +322,6 @@ text:
 	defb "1974 album ", '"', "Snowflakes Are Dancing", '"', " was used during the closing ceremony of the", 13;
 	defb "Tokyo 2020 Olympics. This arrangement used Aria Maestosa and Arkos Tracker II.", 13;
 	defb 0;
+
+text_lo:
 	defb "NOW PRESS SPACE TO START THE SHOW", 0;

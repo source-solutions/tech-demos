@@ -3,8 +3,8 @@
 
 ;	// Copyright (c) 2021 Source Solutions, Inc.
 
-;	// OS hook codes
-	include "UNODOS3.INC"
+;	// system headers
+	include "../../../SYSTEM/HEADERS/SYSTEM.INC"
 
 	frame equ 23672;					// returns to zero every second
 	back_buffer equ $a800;				// upper limit of non-paged RAM
@@ -14,42 +14,19 @@
 	org $6000
 
 ;	// print intro text
+	xor a;								// LD A, 0 (system screen)
+	call SEScreenMode;					// API: set screen mode (also does CLS)
 
-pr_text:
-	ld a, 12;							// FF
-	rst print_a;						// clear screen
-	ld a, 2;							// select main screen
-	call chan_open;						// select channel
-	ld hl, text;						// point to text
+	ld ix, text;						// point to text
+	call SEScreenPrintString;			// API: print ASCIIZ string
 
-pr_loop:
-	ld a, (hl);							// get character
-	and a;								// terminating byte?
-	jr z, pr_lower;						// jump if so;
-	rst print_a;						// print character
-	inc hl;								// point to next character
-	jr pr_loop;							// loop until done
-
-pr_lower
-	inc hl;								// next position
-	push hl;							// stack pointer
-	ld a, 1;							// select lower screen
-	call chan_open;						// select channel
-	pop hl;								// unstack pointer
-
-pr_l_loop:
-	ld a, (hl);							// get character
-	and a;								// terminating byte?
-	jr z, pr_key;						// jump if so;
-	rst print_a;						// print character
-	inc hl;								// point to next character
-	jr pr_l_loop;						// loop until done
+	ld ix, text_lo;						// point to text
+	call SEScreenLowerPrintString;		// API: print ASCIIZ string (lower screen)
 
 pr_key:
-	ld a, $7f;							// high byte of I/O address
-	in a, ($fe);						// read byte
-	rra;								// set carry if space pressed
-	jp c, pr_key;						// loop until space pressed
+	call SEKeyWait;						// wait for a keypress
+	cp ' ';								// space?
+	jr nz, pr_key;						// loop if not
 
 ;	// set the palette
 
@@ -62,8 +39,8 @@ setup:
 	out (c), a;							// set it
 	ld a, %00000010;					// 8x1 attribute mode
 	out ($ff), a;						// set it (SCLD)
-	ld hl, palette + 63;				// last entry in palette
-	call set_palette;					// set the palette
+	ld ix, palette;						// last entry in palette
+	call SEPaletteSet;					// API: set 64 palette registers
 	call mute_psg;						// sound off
 
 start_movie:
@@ -262,7 +239,7 @@ reg:
 	defb 0
 
 text:
-	defb " Juggler (Version 1.2)", 13;
+	defb " Juggler - version 1.3", 13;
  	defb " Copyright (C) 1986 Eric Graham", 13;
 	defb 13;
 	defb " The images were generated with a standard Amiga with 512K memory. A ray", 13;
@@ -284,8 +261,10 @@ text:
 	defb " milliseconds. A fixed palette is used to avoid having to set the", 13;
 	defb " palette registers on each frame. This enables a constant frame rate of", 13;
 	defb " 30 frames per second.";
+
+text_lo:
 	defb 0;
-	defb " NOW PRESS SPACE TO START THE DEMO", 0;
+	defb "NOW PRESS SPACE TO START THE DEMO", 0;
 
 palette:
 	incbin "PALETTE.RAW"

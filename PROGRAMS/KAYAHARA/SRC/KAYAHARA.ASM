@@ -25,8 +25,8 @@
 ;	// D0h - frame 01		X0h - frame 15		R1b - ROM
 ;	// D0l - frame 00		X0l - frame 14		R1a - ROM
 
-;	// OS hook codes
-	include "UNODOS3.INC"
+;	// system headers
+	include "../../../SYSTEM/HEADERS/SYSTEM.INC"
 
 ;	// SCLD control
 	scld equ $ff;
@@ -83,41 +83,19 @@
 	org $6000
 
 ;	// print intro text
-pr_text:
-	ld a, 12;							// FF
-	rst print_a;						// clear screen
-	ld a, 2;							// select main screen
-	call chan_open;						// select channel
-	ld hl, text;						// point to text
+	xor a;								// LD A, 0 (system screen)
+	call SEScreenMode;					// API: set screen mode (also does CLS)
 
-pr_loop:
-	ld a, (hl);							// get character
-	and a;								// terminating byte?
-	jr z, pr_lower;						// jump if so;
-	rst print_a;						// print character
-	inc hl;								// point to next character
-	jr pr_loop;							// loop until done
+	ld ix, text;						// point to text
+	call SEScreenPrintString;			// API: print ASCIIZ string
 
-pr_lower
-	inc hl;								// next position
-	push hl;							// stack pointer
-	ld a, 1;							// select lower screen
-	call chan_open;						// select channel
-	pop hl;								// unstack pointer
-
-pr_l_loop:
-	ld a, (hl);							// get character
-	and a;								// terminating byte?
-	jr z, pr_key;						// jump if so;
-	rst print_a;						// print character
-	inc hl;								// point to next character
-	jr pr_l_loop;						// loop until done
+	ld ix, text_lo;						// point to text
+	call SEScreenLowerPrintString;		// API: print ASCIIZ string (lower screen)
 
 pr_key:
-	ld a, $7f;							// high byte of I/O address
-	in a, ($fe);						// read byte
-	rra;								// set carry if space pressed
-	jp c, pr_key;						// loop until space pressed
+	call SEKeyWait;						// wait for a keypress
+	cp ' ';								// space?
+	jr nz, pr_key;						// loop if not
 
 ;	// original start
 	di;									// interrupts off
@@ -669,7 +647,7 @@ start:
 	jp start;
 
 text:
-	defb "Kayahara (Version 1.2)", 13;
+	defb "Kayahara - version 1.3", 13;
  	defb "Copyright (C) 2003 Nobuyuki Kayahara", 13;
 	defb 13;
 	defb "The ", '"', "Spinning Dancer", '"', ", also known as the ", '"', "Silhouette Illusion", '"', ", is a kinetic,", 13;
@@ -692,4 +670,6 @@ text:
 	defb "All 128K of shadow RAM and part of the main RAM is used with paging between each", 13;
 	defb "image. In this version the anamtion is synced to the interrupt at 30 FPS.", 13;
 	defb 0;
+
+text_lo:
 	defb "NOW PRESS SPACE TO START THE DEMO", 0;

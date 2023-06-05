@@ -1,9 +1,9 @@
 ;	// ANIMSCR - A video player for SCR frames with a fixed 17 color palette
 
-;	// Copyright (c) 2022 Source Solutions, Inc.
+;	// Copyright (c) 2022-2023 Source Solutions, Inc.
 
-;	// OS hook codes
-	include "UNODOS3.INC"
+;	// system headers
+	include "../../../SYSTEM/HEADERS/SYSTEM.INC"
 
 	frame equ 23672;					// returns to zero every second
 	back_buffer equ $a800;				// upper limit of non-paged RAM
@@ -13,42 +13,19 @@
 	org $6000
 
 ;	// print intro text
+	xor a;								// LD A, 0 (system screen)
+	call SEScreenMode;					// API: set screen mode (also does CLS)
 
-pr_text:
-	ld a, 12;							// FF
-	rst print_a;						// clear screen
-	ld a, 2;							// select main screen
-	call chan_open;						// select channel
-	ld hl, text;						// point to text
+	ld ix, text;						// point to text
+	call SEScreenPrintString;			// API: print ASCIIZ string
 
-pr_loop:
-	ld a, (hl);							// get character
-	cp $ff;								// terminating byte?
-	jr z, pr_lower;						// jump if so;
-	rst print_a;						// print character
-	inc hl;								// point to next character
-	jr pr_loop;							// loop until done
-
-pr_lower
-	inc hl;								// next position
-	push hl;							// stack pointer
-	ld a, 1;							// select lower screen
-	call chan_open;						// select channel
-	pop hl;								// unstack pointer
-
-pr_l_loop:
-	ld a, (hl);							// get character
-	cp $ff;								// terminating byte?
-	jr z, pr_key;						// jump if so;
-	rst print_a;						// print character
-	inc hl;								// point to next character
-	jr pr_l_loop;						// loop until done
+	ld ix, text_lo;						// point to text
+	call SEScreenLowerPrintString;		// API: print ASCIIZ string (lower screen)
 
 pr_key:
-	ld a, $7f;							// high byte of I/O address
-	in a, ($fe);						// read byte
-	rra;								// set carry if space pressed
-	jp c, pr_key;						// loop until space pressed
+	call SEKeyWait;						// wait for a keypress
+	cp ' ';								// space?
+	jr nz, pr_key;						// loop if not
 
 ;	// set the palette
 
@@ -61,8 +38,8 @@ setup:
 	out (c), a;							// set it
 	ld a, %00000010;					// 8x1 attribute mode
 	out ($ff), a;						// set it (SCLD)
-	ld hl, palette + 63;				// last entry in palette
-	call set_palette;					// set the palette
+	ld ix, palette;						// first entry in palette
+	call SEPaletteSet;					// API: set 64 palette registers
 
 start_movie:
 	ld hl, frame_no;					// address frame number (ASCII)
@@ -122,22 +99,6 @@ show_frame:
 
 ;	// subroutines
 
-set_palette:
-	ld c, $3b;							// palette port
-	ld de, $00bf;						// d = data, e = register
-	ld a, 64;							// becomes 63
-;	halt;								// wait for vblank
-
-palette_loop:
-	dec a;								// next register
-	ld b, e;							// register port
-	out (c), a;							// select register
-	ld b, d;							// data port
-	outd;								// dec b; out bc, (hl); dec hl
-	and a;								// was that the last register?
-	jr nz, palette_loop;				// set all 64 entries
-	ret;								// done
-
 load:
 	ld a, (handle);						// file handle
 	jp SEFileRead;						// exit via read file vector
@@ -167,8 +128,8 @@ reg:
 	defb 0
 
 text:
-	defb " ANIMSCR (Version 1.0)", 13
- 	defb " Copyright (c) 2022 Source Solutions, Inc.", 13
+	defb " AnimSCR - version 1.1", 13
+ 	defb " Copyright (C) 2022-2023 Source Solutions, Inc.", 13
 	defb 13
 	defb " Convert animated GIF images to single frames using Image Magcik:", 13
 	defb " https://www.imagemagick.org/Usage/anim_basics/#adjoin", 13
@@ -189,8 +150,10 @@ text:
 	defb 13
 	defb " You can strip the last 64 bytes of palette data from the SCR files.", 13
 	defb " With trimmed files, 99 frames is still over a megabyte of data.", 13
-	defb $ff
-	defb " NOW PRESS SPACE TO START THE MOVIE", $ff
+	defb 0
+
+text_lo:
+	defb " NOW PRESS SPACE TO START THE MOVIE", 0
 
 palette:
 	incbin "PALETTE.RAW"

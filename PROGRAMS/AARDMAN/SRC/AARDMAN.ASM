@@ -16,8 +16,8 @@
 
 ;	// Conversion to app format / 60Hz by Source Solutions, Inc.
 
-;	// OS hook codes
-	include "UNODOS3.INC"
+;	// system headers
+	include "../../../SYSTEM/HEADERS/SYSTEM.INC"
 
 ;	// I/O ports
 	uno_reg equ $fc3b;
@@ -75,10 +75,9 @@ pr_l_loop:
 	jr pr_l_loop;						// loop until done
 
 pr_key:
-	ld a, $7f;							// high byte of I/O address
-	in a, ($fe);						// read byte
-	rra;								// set carry if space pressed
-	jp c, pr_key;						// loop until space pressed
+	call SEKeyWait;						// wait for a keypress
+	cp ' ';								// space?
+	jr nz, pr_key;						// loop if not
 
 ;	// set palette
 	ld c, $3b;							// ZXI port
@@ -101,7 +100,7 @@ pr_key:
 	jp L8000
 
 text:
-	defb "Aardman (Version 1.1)", 13;
+	defb "Aardman - version 1.2", 13;
  	defb "Copyright (C) 1987 Aardman Animations, (P) 1958 Bethlehem Records.", 13;
 	defb 13;
 	defb "Nina Simone's ", '"', "My Baby Just Cares For Me", '"', " originally appeared on the 1958 album", 13;
@@ -124,6 +123,8 @@ text:
 	defb "The monochromatic tones of the video made it a good candidate for conversion to", 13;
 	defb "the DMA player format previously used in the ", '"', "Bad Apple !!", '"', " demo.", 13;
 	defb 0;
+
+text_lo:
 	defb "NOW PRESS SPACE TO START THE DEMO", 0;
 
 	org $8000
