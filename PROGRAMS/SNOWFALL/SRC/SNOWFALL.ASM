@@ -257,28 +257,28 @@ handle;
 	defb 0;								// file handle
 
 text:
-	defb "Snowfall - version 1.3", 13;
+	defb "Snowfall - version 1.0", 13;
  	defb "Copyright (C) 2024 Source Solutions, Inc.", 13;
 	defb 13;
-	defb "a", 13;
-	defb "b", 13;
-	defb "c", 13;
-	defb "d", 13;
+	defb "Mark Ferrari is the undisputed master of color cycling. He started as an artist", 13;
+	defb "at Lucasfilm Games when EGA was the only palette (of 16 fixed colors) available", 13;
+	defb "and dither wouldn't compress. Ron Gilbert solved that problem and the result was", 13;
+	defb '"Loom" which won awards for its graphics that some people mistook for VGA.', 13;
 	defb 13;
-	defb "e", 13;
-	defb "f", 13;
-	defb "g", 13;
-	defb "h", 13;
+	defb 'The next game he worked on was "The Secret of Monkey Island". He remains', 13;
+	defb "interested in 8-bit 256 color images. He believes that the resources are so vast", 13;
+	defb "now that no-one has time to master the tools. But he spent a decade using Deluxe", 13;
+	defb "Paint. One image he created with it is a woodland scene with falling snowflakes.", 13;
 	defb 13;
-	defb "i", 13;
-	defb "j", 13;
-	defb "k", 13;
-	defb "l", 13;
+	defb "But he didn't have to deal with attribute cells. To create this image, the tree", 13;
+	defb "line was blocked off and snow paths drawn so that each flake was always at least", 13;
+	defb "8 pixels apart from its neighbor. Due to the gradient background, only 3 frames", 13;
+	defb "of animation are possible, but this could be increased using raster interrupts.", 13;
 	defb 13;
-	defb "m", 13;
-	defb "n", 13;
-	defb "o", 13;
-	defb "p", 13;
+	defb "The animation uses 24 colors in two color look-up tables (CLUTs). The foreground", 13;
+	defb "is drawn in its own CLUT of 16 colors. The cabin is inspired by a painting that", 13;
+	defb "was selected because the viewing angle lends itself to 8x1 pixel attributes. As", 13;
+	defb "a result there is almost no color clash at all.", 13;
 	defb 0;
 
 text_lo:

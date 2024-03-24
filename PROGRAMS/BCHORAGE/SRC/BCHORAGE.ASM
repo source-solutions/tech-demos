@@ -309,28 +309,28 @@ handle;
 	defb 0;								// file handle
 
 text:
-	defb "BoR - version 1.3", 13;
+	defb "Beach of Rage - version 1.0", 13;
  	defb "Copyright (C) 2024 Source Solutions, Inc.", 13;
 	defb 13;
-	defb "a", 13;
-	defb "b", 13;
-	defb "c", 13;
-	defb "d", 13;
+	defb 'The "Streets of Rage" series were among the most popular side-scrolling beat-em-', 13;
+	defb 'ups on the Sega Genesis. Unlike fantasy "Golden Axe" and sci-fi "Alien Strom",', 13;
+	defb '"Streets" did not originate in the arcades and had a contemporary setting. It', 13;
+	defb "also had the best graphics and soundtrack, although the gameplay was similar.", 13;
 	defb 13;
-	defb "e", 13;
-	defb "f", 13;
-	defb "g", 13;
-	defb "h", 13;
+	defb "Although the Genesis had already been out for three years when it was released,", 13;
+	defb "the Sega Master System was still popular. But it lacked the advanced graphics", 13;
+	defb "hardware of the Genesis. So when Sega ported the game, it had to rely on tricks", 13;
+	defb "like palette cycling to produce animation without large CPU and data overheds.", 13;
 	defb 13;
-	defb "i", 13;
-	defb "j", 13;
-	defb "k", 13;
-	defb "l", 13;
+	defb "Images are drawn in such a way that changing the value of a set number of", 13;
+	defb "palette entries gives the illusion of movement. In this image the water lapping", 13;
+	defb "at the shore is taken directly from the Master System version but carefully", 13;
+	defb "pixel aligned to minimize the effects of 8x1 pixel attributes.", 13;
 	defb 13;
-	defb "m", 13;
-	defb "n", 13;
-	defb "o", 13;
-	defb "p", 13;
+	defb "The rain cycles through a separate set of 8 colors. If you wanted to make a game", 13;
+	defb "using this approach you'd be limited to moving the background 8 pixels at a time", 13;
+	defb "because of the attributes. But you could quickly draw it over the animated rain.", 13;
+	defb "But if you were careful you could still give the sprites 1 pixel movement.", 13;
 	defb 0;
 
 text_lo:
