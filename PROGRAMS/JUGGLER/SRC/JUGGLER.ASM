@@ -24,7 +24,7 @@
 	call SEScreenLowerPrintString;		// API: print ASCIIZ string (lower screen)
 
 pr_key:
-	call SEKeyWait;						// wait for a keypress
+	call SEKeyboardWaitKey;						// wait for a keypress
 	cp ' ';								// space?
 	jr nz, pr_key;						// loop if not
 
@@ -40,7 +40,7 @@ setup:
 	ld a, %00000010;					// 8x1 attribute mode
 	out ($ff), a;						// set it (SCLD)
 	ld ix, palette;						// last entry in palette
-	call SEPaletteSet;					// API: set 64 palette registers
+	call SEGraphicsPaletteSet;					// API: set 64 palette registers
 	call mute_psg;						// sound off
 
 start_movie:

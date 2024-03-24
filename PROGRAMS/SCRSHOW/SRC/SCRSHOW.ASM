@@ -293,14 +293,14 @@ pr_text:
 	call SEScreenLowerPrintString;		// API: print ASCIIZ string (lower screen)
 
 pr_key:
-	call SEKeyWait;						// wait for a keypress
+	call SEKeyboardWaitKey;						// wait for a keypress
 	cp ' ';								// space?
 	jr nz, pr_key;						// loop if not
 	ret;								// end of subroutine
 
 text:
 	defb "Slideshow - version 1.2", 13;
- 	defb "Copyright (C) 2019-2023 Source Solutions, Inc.", 13;
+ 	defb "Copyright (C) 2019-2024 Source Solutions, Inc.", 13;
 	defb 13;
 	defb "The slideshow app was the first demos written specifically for the Chloe 280SE.", 13;
 	defb "It was intended as a tech demo to show off how to recursively read files from a", 13;

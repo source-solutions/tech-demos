@@ -1,7 +1,7 @@
 ;	// 2019 - An example of how to load data sequentially and
 ;	//        scroll a 1-bit BMP file vertically across the screen
 
-;	// Copyright (c) 2020-2023 Source Solutions, Inc.
+;	// Copyright (c) 2020-2024 Source Solutions, Inc.
 
 ;	// system headers
 	include "../../../SYSTEM/HEADERS/SYSTEM.INC"
@@ -24,7 +24,7 @@
 	call SEScreenLowerPrintString;		// API: print ASCIIZ string (lower screen)
 
 pr_key:
-	call SEKeyWait;						// wait for a keypress
+	call SEKeyboardWaitKey;				// wait for a keypress
 	cp ' ';								// space?
 	jr nz, pr_key;						// loop if not
 
@@ -452,7 +452,7 @@ fade_7 equ fade_6 + 64
 
 text:
 	defb "2019 - Version 1.2", 13;
- 	defb "Copyright (C) 2020-2023 Source Solutions, Inc.", 13;
+ 	defb "Copyright (C) 2020-2024 Source Solutions, Inc.", 13;
 	defb 13;
 	defb "In November 2019, Chloe Corporation launched a Patreon to rasie funds for the", 13;
 	defb "development of the Chloe 280SE. To accompany the launch event, a short video was", 13;

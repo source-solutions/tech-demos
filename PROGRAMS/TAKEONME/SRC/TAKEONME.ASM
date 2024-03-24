@@ -53,7 +53,7 @@
 	call SEScreenLowerPrintString;		// API: print ASCIIZ string (lower screen)
 
 pr_key:
-	call SEKeyWait;						// wait for a keypress
+	call SEKeyboardWaitKey;						// wait for a keypress
 	cp ' ';								// space?
 	jr nz, pr_key;						// loop if not
 

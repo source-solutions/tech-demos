@@ -1,6 +1,6 @@
 ;	// ANIMSCR - A video player for SCR frames with a fixed 17 color palette
 
-;	// Copyright (c) 2022-2023 Source Solutions, Inc.
+;	// Copyright (c) 2022-2024 Source Solutions, Inc.
 
 ;	// system headers
 	include "../../../SYSTEM/HEADERS/SYSTEM.INC"
@@ -23,7 +23,7 @@
 	call SEScreenLowerPrintString;		// API: print ASCIIZ string (lower screen)
 
 pr_key:
-	call SEKeyWait;						// wait for a keypress
+	call SEKeyboardWaitKey;				// wait for a keypress
 	cp ' ';								// space?
 	jr nz, pr_key;						// loop if not
 
@@ -39,7 +39,7 @@ setup:
 	ld a, %00000010;					// 8x1 attribute mode
 	out ($ff), a;						// set it (SCLD)
 	ld ix, palette;						// first entry in palette
-	call SEPaletteSet;					// API: set 64 palette registers
+	call SEGraphicsPaletteSet;			// API: set 64 palette registers
 
 start_movie:
 	ld hl, frame_no;					// address frame number (ASCII)
@@ -129,7 +129,7 @@ reg:
 
 text:
 	defb " AnimSCR - version 1.1", 13
- 	defb " Copyright (C) 2022-2023 Source Solutions, Inc.", 13
+ 	defb " Copyright (C) 2022-2024 Source Solutions, Inc.", 13
 	defb 13
 	defb " Convert animated GIF images to single frames using Image Magcik:", 13
 	defb " https://www.imagemagick.org/Usage/anim_basics/#adjoin", 13

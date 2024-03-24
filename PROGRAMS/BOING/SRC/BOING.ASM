@@ -24,7 +24,7 @@
 	call SEScreenLowerPrintString;		// API: print ASCIIZ string (lower screen)
 
 pr_key:
-	call SEKeyWait;						// wait for a keypress
+	call SEKeyboardWaitKey;						// wait for a keypress
 	cp ' ';								// space?
 	jr nz, pr_key;						// loop if not
 
@@ -41,7 +41,7 @@ setup:
 ;	ld hl, palette + 63;				// last entry in palette
 ;	call set_palette;					// set the palette
 	ld ix, palette;						// first entry in palette
-	call SEPaletteSet;					// API: set 64 palette registers
+	call SEGraphicsPaletteSet;			// API: set 64 palette registers
 
 	call mute_psg
 
@@ -299,7 +299,7 @@ reg:
 
 text:
 	defb "Boing Ball - version 1.2", 13;
- 	defb "Copyright (C) 2021-2023 Source Solutions, Inc.", 13;
+ 	defb "Copyright (C) 2021-2024 Source Solutions, Inc.", 13;
 	defb 13;
 	defb "The original version of this demo was created by Robert J. Mical and Dale Luck", 13;
 	defb "for the 1984 Consumer Electronics Show (CES) in Las Vegas. It was designed to", 13;

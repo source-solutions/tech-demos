@@ -22,7 +22,7 @@
 	call SEScreenLowerPrintString;		// API: print ASCIIZ string (lower screen)
 
 pr_key:
-	call SEKeyWait;						// wait for a keypress
+	call SEKeyboardWaitKey;						// wait for a keypress
 	cp ' ';								// space?
 	jr nz, pr_key;						// loop if not
 
@@ -52,7 +52,7 @@ ld_title_scr:
 	call close;							// close file
 
  	ld ix, $f83f -63;					// last byte of palette
-	call SEPaletteSet;					// API: set 64 palette registers
+	call SEGraphicsPaletteSet;					// API: set 64 palette registers
 
 ram_pag:
 	ld a, %00011000;					// video 1, ROM 1, RAM 0

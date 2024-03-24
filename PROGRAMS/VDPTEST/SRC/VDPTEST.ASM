@@ -83,7 +83,7 @@
 	call SEScreenLowerPrintString;		// API: print ASCIIZ string (lower screen)
 
 pr_key:
-	call SEKeyWait;						// wait for a keypress
+	call SEKeyboardWaitKey;						// wait for a keypress
 	cp ' ';								// space?
 	jr nz, pr_key;						// loop if not
 
@@ -336,18 +336,9 @@ wait2:
 	ret;								// return
 
 space:
-	ld b, 180;							// frames to wait
-
-space2:
-	ld a, $7f;							// high byte of I/O address
-	in a, ($fe);						// read byte
-	rra;								// set carry if space pressed
-	jr c, space3;						// jump if not
-	ld b, 2;							// change count
-
-space3;
-	call wait;							// wait 2 frames
-	djnz space2;
+	call SEKeyboardWaitKey;				// wait for a keypress
+	cp ' ';								// space?
+	jr nz, space;						// loop if not
 	ret;								// done
 
 ;	// data
