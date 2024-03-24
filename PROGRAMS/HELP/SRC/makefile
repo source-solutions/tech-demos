@@ -1,0 +1,3 @@
+prg:
+	pasmo HELP.ASM ../PRG/HELP.PRG
+	pasmo MARKDOWN.ASM ../RSC/MARKDOWN.BIN
