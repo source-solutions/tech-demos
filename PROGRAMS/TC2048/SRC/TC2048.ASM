@@ -49,14 +49,17 @@ pr_key:
 	jr nz, pr_key;						// loop if not
 
 ;	// load ROM file
-	ld ix, filename;					// /rsc/48.rom
-	call SEFileOpenExists;				// open file
-	ld (handle), a;						// store file handle
-	ld bc, 16384;						// file size
-	ld ix, $8000;						// load in fast RAM.
-	call SEFileRead;					// read file
-	ld a, (handle);						// restore handle
-	call SEFileClose;					// close file
+;	ld ix, filename;					// /rsc/48.rom
+;	call SEFileOpenExists;				// open file
+;	ld (handle), a;						// store file handle
+;	ld bc, 16384;						// file size
+;	ld ix, $8000;						// load in fast RAM.
+;	call SEFileRead;					// read file
+;	ld a, (handle);						// restore handle
+;	call SEFileClose;					// close file
+	ld ix, filename;					// filepath: /RSC/TC2048.ROM
+	ld hl, $8000;						// load in fast RAM.
+	call SEFileLoad;					// load it
 
 ;	// initial setup
 	di;									// interrupts off
@@ -168,8 +171,8 @@ pr_key:
 filename:
 	defb "tc2048.rom", 0;				// ROM file in resource folder
 
-handle:
-	defb 0
+;handle:
+;	defb 0
 
 path:
 	defb "/PROGRAMS/TC2048/RSC/SNAPS/", 0;
